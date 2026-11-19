@@ -68,6 +68,7 @@ const Botao = styled(Link)`
 `
 
 type Props = {
+  id: number
   titulo: string
   nota: number
   descricao: string
@@ -75,7 +76,7 @@ type Props = {
   tags: string[]
 }
 
-const Restaurant = ({ titulo, nota, descricao, imagem, tags }: Props) => (
+const Restaurant = ({ id, titulo, nota, descricao, imagem, tags }: Props) => (
   <Card>
     <img src={imagem} alt={titulo} />
     <Tags>
@@ -91,7 +92,7 @@ const Restaurant = ({ titulo, nota, descricao, imagem, tags }: Props) => (
         </span>
       </div>
       <p>{descricao}</p>
-      <Botao to="/perfil">Saiba mais</Botao>
+     <Botao to={`/perfil/${id}`}>Saiba mais</Botao>
     </Conteudo>
   </Card>
 )

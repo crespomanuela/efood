@@ -1,13 +1,16 @@
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from '../../components/Header'
 import Product from '../../components/Product'
-import banner from '../../assets/images/banner.png'
-import pizza from '../../assets/images/pizza.png'
 import { cores } from '../../styles'
+import Modal from '../../components/Modal'
+import type { Prato, Restaurante } from '../../types'
 
-const Banner = styled.div`
-  background-image: url(${banner});
+const Banner = styled.div<{ $capa: string }>`
+  background-image: url(${(props) => props.$capa});
   background-size: cover;
+  background-position: center;
   height: 280px;
   position: relative;
   color: ${cores.branco};
@@ -31,6 +34,7 @@ const Banner = styled.div`
 
   span {
     font-weight: 100;
+    text-transform: capitalize;
   }
 
   h2 {
@@ -45,31 +49,57 @@ const Lista = styled.ul`
   padding: 56px 0 120px;
 `
 
-const pratos = [1, 2, 3, 4, 5, 6]
+const Perfil = () => {
+  const { id } = useParams()
+  const [restaurante, setRestaurante] = useState<Restaurante>()
+  const [pratoSelecionado, setPratoSelecionado] = useState<Prato | null>(null) // b
 
-const Perfil = () => (
-  <>
-    <Header />
-    <Banner>
+  useEffect(() => {
+    fetch(`https://api-ebac.vercel.app/api/efood/restaurantes/${id}`)
+      .then((res) => res.json())
+      .then((res) => setRestaurante(res))
+  }, [id])
+
+  if (!restaurante) {
+    return (
+      <>
+        <Header />
+        <h3 className="container">Carregando...</h3>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Header />
+      <Banner $capa={restaurante.capa}>
+        <div className="container">
+          <span>{restaurante.tipo}</span>
+          <h2>{restaurante.titulo}</h2>
+        </div>
+      </Banner>
       <div className="container">
-        <span>Italiana</span>
-        <h2>La Dolce Vita Trattoria</h2>
+        <Lista>
+          {restaurante.cardapio.map((prato) => (
+            <li key={prato.id}>
+              <Product
+                titulo={prato.nome}
+                descricao={prato.descricao}
+                imagem={prato.foto}
+                aoClicar={() => setPratoSelecionado(prato)} // c
+              />
+            </li>
+          ))}
+        </Lista>
       </div>
-    </Banner>
-    <div className="container">
-      <Lista>
-        {pratos.map((id) => (
-          <li key={id}>
-            <Product
-              titulo="Pizza Marguerita"
-              descricao="A clássica Marguerita: molho de tomate suculento, mussarela derretida, manjericão fresco e um toque de azeite. Sabor e simplicidade!"
-              imagem={pizza}
-            />
-          </li>
-        ))}
-      </Lista>
-    </div>
-  </>
-)
+      {pratoSelecionado && ( // d
+        <Modal
+          prato={pratoSelecionado}
+          aoFechar={() => setPratoSelecionado(null)}
+        />
+      )}
+    </>
+  )
+}
 
 export default Perfil

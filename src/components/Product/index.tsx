@@ -5,6 +5,9 @@ const Card = styled.div`
   background-color: ${cores.salmao};
   color: ${cores.begeEscuro};
   padding: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   img {
     width: 100%;
@@ -23,6 +26,11 @@ const Card = styled.div`
     font-size: 14px;
     line-height: 22px;
     margin-bottom: 8px;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   button {
@@ -41,14 +49,17 @@ type Props = {
   titulo: string
   descricao: string
   imagem: string
+  aoClicar: () => void
 }
 
-const Product = ({ titulo, descricao, imagem }: Props) => (
+const Product = ({ titulo, descricao, imagem, aoClicar }: Props) => (
   <Card>
     <img src={imagem} alt={titulo} />
     <h3>{titulo}</h3>
     <p>{descricao}</p>
-    <button type="button">Adicionar ao carrinho</button>
+    <button type="button" onClick={aoClicar}>
+      Adicionar ao carrinho
+    </button>
   </Card>
 )
 
