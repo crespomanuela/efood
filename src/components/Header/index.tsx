@@ -1,8 +1,11 @@
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import logo from '../../assets/images/logo.svg'
 import fundo from '../../assets/images/fundo-2.png'
 import { cores } from '../../styles'
+import type { RootState } from '../../store'
+import { abrir } from '../../store/reducers/carrinho'
 
 const Container = styled.header`
   background-image: url(${fundo});
@@ -22,16 +25,28 @@ const Container = styled.header`
     color: ${cores.salmao};
     text-decoration: none;
   }
+
+  span {
+    color: ${cores.salmao};
+    cursor: pointer;
+  }
 `
 
-const Header = () => (
-  <Container>
-    <div className="container">
-      <Link to="/">Restaurantes</Link>
-      <img src={logo} alt="efood" />
-      <span>0 produto(s) no carrinho</span>
-    </div>
-  </Container>
-)
+const Header = () => {
+  const { itens } = useSelector((state: RootState) => state.carrinho)
+  const dispatch = useDispatch()
+
+  return (
+    <Container>
+      <div className="container">
+        <Link to="/">Restaurantes</Link>
+        <img src={logo} alt="efood" />
+        <span onClick={() => dispatch(abrir())}>
+          {itens.length} produto(s) no carrinho
+        </span>
+      </div>
+    </Container>
+  )
+}
 
 export default Header

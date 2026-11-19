@@ -5,6 +5,7 @@ import Header from '../../components/Header'
 import Product from '../../components/Product'
 import { cores } from '../../styles'
 import Modal from '../../components/Modal'
+import Cart from '../../components/Cart'
 import type { Prato, Restaurante } from '../../types'
 
 const Banner = styled.div<{ $capa: string }>`
@@ -52,7 +53,7 @@ const Lista = styled.ul`
 const Perfil = () => {
   const { id } = useParams()
   const [restaurante, setRestaurante] = useState<Restaurante>()
-  const [pratoSelecionado, setPratoSelecionado] = useState<Prato | null>(null) // b
+  const [pratoSelecionado, setPratoSelecionado] = useState<Prato | null>(null)
 
   useEffect(() => {
     fetch(`https://api-ebac.vercel.app/api/efood/restaurantes/${id}`)
@@ -86,18 +87,19 @@ const Perfil = () => {
                 titulo={prato.nome}
                 descricao={prato.descricao}
                 imagem={prato.foto}
-                aoClicar={() => setPratoSelecionado(prato)} // c
+                aoClicar={() => setPratoSelecionado(prato)}
               />
             </li>
           ))}
         </Lista>
       </div>
-      {pratoSelecionado && ( // d
+      {pratoSelecionado && (
         <Modal
           prato={pratoSelecionado}
           aoFechar={() => setPratoSelecionado(null)}
         />
       )}
+      <Cart />
     </>
   )
 }
