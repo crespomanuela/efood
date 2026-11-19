@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../../store'
 import { fechar, remover } from '../../store/reducers/carrinho'
 import { cores } from '../../styles'
 import { formataPreco } from '../../utils'
+import Checkout from '../Checkout'
 
 const Container = styled.div<{ $aberto: boolean }>`
   position: fixed;
@@ -66,6 +68,12 @@ const Item = styled.li`
   }
 `
 
+const Vazio = styled.p`
+  color: ${cores.begeEscuro};
+  font-size: 14px;
+  text-align: center;
+`
+
 const Total = styled.p`
   display: flex;
   justify-content: space-between;
@@ -89,36 +97,54 @@ const Botao = styled.button`
 const Cart = () => {
   const { itens, aberto } = useSelector((state: RootState) => state.carrinho)
   const dispatch = useDispatch()
+  const [mostrarCheckout, setMostrarCheckout] = useState(false)
 
   const total = itens.reduce((acumulador, item) => acumulador + item.preco, 0)
+
+  const continuar = () => {
+    if (itens.length === 0) {
+      alert('Adicione pelo menos um prato ao carrinho')
+      return
+    }
+    setMostrarCheckout(true)
+  }
 
   return (
     <Container $aberto={aberto}>
       <Overlay onClick={() => dispatch(fechar())} />
       <Sidebar>
-        <ul>
-          {itens.map((item) => (
-            <Item key={item.id}>
-              <img src={item.foto} alt={item.nome} />
-              <div>
-                <h3>{item.nome}</h3>
-                <span>{formataPreco(item.preco)}</span>
-              </div>
-              <button
-                type="button"
-                aria-label="Remover"
-                onClick={() => dispatch(remover(item.id))}
-              >
-                ✕
-              </button>
-            </Item>
-          ))}
-        </ul>
-        <Total>
-          <span>Valor total</span>
-          <span>{formataPreco(total)}</span>
-        </Total>
-        <Botao type="button">Continuar com a entrega</Botao>
+        {mostrarCheckout ? (
+          <Checkout aoVoltarAoCarrinho={() => setMostrarCheckout(false)} />
+        ) : (
+          <>
+            {itens.length === 0 && <Vazio>O carrinho está vazio</Vazio>}
+            <ul>
+              {itens.map((item) => (
+                <Item key={item.id}>
+                  <img src={item.foto} alt={item.nome} />
+                  <div>
+                    <h3>{item.nome}</h3>
+                    <span>{formataPreco(item.preco)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Remover"
+                    onClick={() => dispatch(remover(item.id))}
+                  >
+                    ✕
+                  </button>
+                </Item>
+              ))}
+            </ul>
+            <Total>
+              <span>Valor total</span>
+              <span>{formataPreco(total)}</span>
+            </Total>
+            <Botao type="button" onClick={continuar}>
+              Continuar com a entrega
+            </Botao>
+          </>
+        )}
       </Sidebar>
     </Container>
   )
